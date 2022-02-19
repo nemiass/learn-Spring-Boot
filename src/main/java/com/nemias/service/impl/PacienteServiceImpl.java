@@ -16,8 +16,9 @@ public class PacienteServiceImpl implements IPacienteService {
     private IPacienteRepo repo;
 
     @Override
-    public void registrar(Paciente pac) {
-        repo.save(pac);
+    public Paciente registrar(Paciente pac) {
+        // retorando el ultimo elemento insertado
+        return repo.save(pac);
     }
 
     @Override
