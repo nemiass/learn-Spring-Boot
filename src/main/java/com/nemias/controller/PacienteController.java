@@ -4,6 +4,8 @@ import com.nemias.exception.ModelNotFoundException;
 import com.nemias.model.Paciente;
 import com.nemias.service.IPacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +15,10 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+
+// importando estaticamente
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RestController
 @RequestMapping("/pacientes")
@@ -34,6 +40,21 @@ public class PacienteController {
             throw new ModelNotFoundException("ID No encontrado " + id);
         }
         return new ResponseEntity<Paciente>(obj.get(), HttpStatus.OK);
+    }
+
+    // Example Hateoas
+    @GetMapping("/hateoas/{id}")
+    public EntityModel<Paciente> leerPorIdHateOas(@PathVariable ("id") Integer id) {
+        Optional<Paciente> obj =  service.leerPorId(id);
+        if (!obj.isPresent()) {
+            throw new ModelNotFoundException("ID No encontrado " + id);
+        }
+        EntityModel<Paciente> resource = EntityModel.of(obj.get());
+        // http://localhost:8080/pacientes/{id} -> eso es lo que estamos contruyendo en la linea 54
+        WebMvcLinkBuilder linkTo = linkTo(methodOn(this.getClass()).leerPorId(id));
+        // asociando el link al resource
+        resource.add(linkTo.withRel("pacientes-recursos"));
+        return resource;
     }
 
     @PostMapping
