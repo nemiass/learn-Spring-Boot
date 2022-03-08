@@ -1,6 +1,7 @@
 package com.nemias.model;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "examen")
@@ -38,5 +39,18 @@ public class Examen {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Examen examen = (Examen) o;
+        return getIdExamen().equals(examen.getIdExamen());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getIdExamen());
     }
 }

@@ -4,6 +4,8 @@ import com.nemias.model.Paciente;
 import com.nemias.repo.IPacienteRepo;
 import com.nemias.service.IPacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,14 +18,14 @@ public class PacienteServiceImpl implements IPacienteService {
     private IPacienteRepo repo;
 
     @Override
-    public Paciente registrar(Paciente pac) {
+    public Paciente registrar(Paciente obj) {
         // retorando el ultimo elemento insertado
-        return repo.save(pac);
+        return repo.save(obj);
     }
 
     @Override
-    public void modificar(Paciente pac) {
-        repo.save(pac);
+    public Paciente modificar(Paciente obj) {
+        return repo.save(obj);
     }
 
     @Override
@@ -39,5 +41,13 @@ public class PacienteServiceImpl implements IPacienteService {
     @Override
     public void eliminar(Integer id) {
         repo.deleteById(id);
+    }
+
+    // nuestro metodo de servicio que nos permitirá la paginacion
+    @Override
+    public Page<Paciente> listarPageable(Pageable pageable) {
+        // usamos el findAll de nuestro repo, ya que este es recibe un tipo de dato Pageable, recordar que este
+        // pageable debe ser de "org.springframework.data.domain.Pageable"
+        return repo.findAll(pageable);
     }
 }

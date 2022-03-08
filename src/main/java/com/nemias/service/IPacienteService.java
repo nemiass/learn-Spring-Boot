@@ -1,14 +1,10 @@
 package com.nemias.service;
 
 import com.nemias.model.Paciente;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-import java.util.Optional;
+public interface IPacienteService extends ICRUD<Paciente> {
 
-public interface IPacienteService {
-    Paciente registrar(Paciente pac);
-    void modificar(Paciente pac);
-    List<Paciente> listar();
-    Optional<Paciente> leerPorId(Integer id);
-    void eliminar(Integer id);
+    Page<Paciente> listarPageable(Pageable pageable);
 }

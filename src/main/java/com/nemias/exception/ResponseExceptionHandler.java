@@ -20,6 +20,29 @@ import java.util.Date;
 @RestController
 public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
 
+    // sobreescribiendo un metodo de nuestro padre, sobreescribiremos un error, mas que todo cuando
+    // enviamos argumentos no validos en los requests
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+            HttpHeaders headers, HttpStatus status, WebRequest request)
+    {
+        // si queremos jalar todos lo errores, nos devolverá una lista con todos los errroes
+        // ex.getBindingResult().getAllErrors();
+        ExceptionResponse exceptionResponse =
+                new ExceptionResponse(new Date(), "validacion fallida", request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    // Si ocurre otro error que nosotros no manejemos, entonces tambien manejaremos a esos errores, que puede
+    // ser cualquier Exception
+    @ExceptionHandler(Exception.class)
+    public final ResponseEntity<ExceptionResponse> manejarTodasExcepciones(Exception ex, WebRequest request)
+    {
+        ExceptionResponse exceptionResponse =
+                new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     // decorador el cual le indicamos la clase de excepcion que va interceptar
     @ExceptionHandler(ModelNotFoundException.class)
     // metodo que interceptará las excepciones ModelNotFoundException
@@ -29,30 +52,5 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
         ExceptionResponse exceptionResponse =
                 new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.NOT_FOUND);
-    }
-
-    // Si ocurre otro error que nosotros no manejemos, entonces tambien manejaremos a esos errores, que puede
-    // ser cualquier Exception
-    @ExceptionHandler(Exception.class)
-    public final ResponseEntity<ExceptionResponse> manejarTodasExcepciones(ModelNotFoundException ex,
-            WebRequest request)
-    {
-        ExceptionResponse exceptionResponse =
-                new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
-        return new ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.NOT_FOUND);
-    }
-
-    // sobreescribiendo un metodo de nuestro padre, sobreescribiremos un error, mas que todo cuando
-    // enviamos argumentos no validos en los requests
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-            HttpHeaders headers, HttpStatus status, WebRequest request)
-    {
-        // si queremos jalar todos lo errores, nos devolverá una lista con todos los errroes
-        // ex.getBindingResult().getAllErrors();
-        String msgException = "validacion fallida";
-        ExceptionResponse exceptionResponse =
-                new ExceptionResponse(new Date(), msgException, request.getDescription(false));
-        return new ResponseEntity<Object>(exceptionResponse, HttpStatus.NOT_FOUND);
     }
 }

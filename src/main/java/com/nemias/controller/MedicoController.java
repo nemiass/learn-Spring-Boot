@@ -1,11 +1,10 @@
 package com.nemias.controller;
 
 import com.nemias.exception.ModelNotFoundException;
-import com.nemias.model.Paciente;
-import com.nemias.service.IPacienteService;
+import com.nemias.model.Medico;
+import com.nemias.service.IMedicoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
@@ -18,58 +17,57 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
-// importando estaticamente
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("/pacientes")
-public class PacienteController {
+@RequestMapping("/medicos")
+public class MedicoController {
 
     @Autowired
-    private IPacienteService service;
+    private IMedicoService service;
 
     @GetMapping
-    public ResponseEntity<List<Paciente>> listar() {
-        List<Paciente> lista = service.listar();
-        return new ResponseEntity<List<Paciente>>(lista, HttpStatus.OK);
+    public ResponseEntity<List<Medico>> listar() {
+        List<Medico> lista = service.listar();
+        return new ResponseEntity<List<Medico>>(lista, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Paciente> leerPorId(@PathVariable ("id") Integer id) {
-        Optional<Paciente> obj =  service.leerPorId(id);
+    public ResponseEntity<Medico> leerPorId(@PathVariable ("id") Integer id) {
+        Optional<Medico> obj =  service.leerPorId(id);
         if (!obj.isPresent()) {
             throw new ModelNotFoundException("ID No encontrado " + id);
         }
-        return new ResponseEntity<Paciente>(obj.get(), HttpStatus.OK);
+        return new ResponseEntity<Medico>(obj.get(), HttpStatus.OK);
     }
 
     // Example Hateoas
     @GetMapping("/hateoas/{id}")
-    public EntityModel<Paciente> leerPorIdHateOas(@PathVariable ("id") Integer id) {
-        Optional<Paciente> obj =  service.leerPorId(id);
+    public EntityModel<Medico> leerPorIdHateOas(@PathVariable ("id") Integer id) {
+        Optional<Medico> obj =  service.leerPorId(id);
         if (!obj.isPresent()) {
             throw new ModelNotFoundException("ID No encontrado " + id);
         }
-        EntityModel<Paciente> resource = EntityModel.of(obj.get());
-        // http://localhost:8080/pacientes/{id} -> eso es lo que estamos contruyendo en la linea 54
+        EntityModel<Medico> resource = EntityModel.of(obj.get());
+        // http://localhost:8080/Medicos/{id} -> eso es lo que estamos contruyendo en la linea 54
         WebMvcLinkBuilder linkTo = linkTo(methodOn(this.getClass()).leerPorId(id));
         // asociando el link al resource
-        resource.add(linkTo.withRel("pacientes-recursos"));
+        resource.add(linkTo.withRel("Medicos-recursos"));
         return resource;
     }
 
     @PostMapping
-    public ResponseEntity<Object> registrar(@Valid @RequestBody Paciente pac) {
-        Paciente paciente = service.registrar(pac);
-        // luego de guardar un nuevo paciente, podemos retornar a ese paceinte insertado en el response, pero tambien
+    public ResponseEntity<Object> registrar(@Valid @RequestBody Medico pac) {
+        Medico Medico = service.registrar(pac);
+        // luego de guardar un nuevo Medico, podemos retornar a ese paceinte insertado en el response, pero tambien
         // podríamos devolverle solamente la ruta del endpoint el cual el feontend pueda hacer un request para
-        // consultar ese paciente, esta url se gurada el header location del reponse, ejemplo:
+        // consultar ese Medico, esta url se gurada el header location del reponse, ejemplo:
         // -> construyendo el location que devolveremos en el reponse, que quivaldría a:
-        // http://localhost:8080/pacientes/3, en el caso que de el id fuese 3
+        // http://localhost:8080/Medicos/3, en el caso que de el id fuese 3
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(paciente.getIdPaciente())
+                .buildAndExpand(Medico.getIdMedico())
                 .toUri();
         return ResponseEntity.created(location).build();
         // esto se usa dependiendo de los requerimientos, ya aveces va ser necesario devolver el objeto
@@ -77,27 +75,19 @@ public class PacienteController {
     }
 
     @PutMapping
-    public ResponseEntity<Object> modificar(@Valid @RequestBody Paciente pac) {
+    public ResponseEntity<Object> modificar(@Valid @RequestBody Medico pac) {
         service.modificar(pac);
         return new ResponseEntity<Object>(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> eliminar(@PathVariable ("id") Integer id) {
-        Optional<Paciente> obj =  service.leerPorId(id);
+        Optional<Medico> obj =  service.leerPorId(id);
         if (!obj.isPresent()) {
             throw new ModelNotFoundException("ID No encontrado " + id);
         } else {
             service.eliminar(id);
         }
         return new ResponseEntity<Object>(obj.get(), HttpStatus.OK);
-    }
-
-    // IMplementando nuestro endpoint para hacer el pageable, osea para listar paginadamente, osea
-    // no se retorna una lista de pacientes, sino una pagina de pacientes
-    @GetMapping("/pageable")
-    public ResponseEntity<Page<Paciente>> listarPageable(Pageable pageable) {
-        Page<Paciente> pacientes = service.listarPageable(pageable);
-        return new ResponseEntity<>(pacientes, HttpStatus.OK);
     }
 }
