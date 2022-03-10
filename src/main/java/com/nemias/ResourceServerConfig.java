@@ -43,8 +43,9 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                 .antMatchers("/examenes/**" ).authenticated()
                 .antMatchers("/medicos/**" ).authenticated()
                 .antMatchers("/menus/**" ).authenticated()
-                //.antMatchers("/tokens/**" ).permitAll()
+                .antMatchers("/tokens/**" ).permitAll()
                 .antMatchers("/consultaExamenes/**" ).authenticated()
-                .antMatchers("/pacientes/**" ).authenticated();
+                .antMatchers("/pacientes/**" ).authenticated(); // .anonymous() -> para que las ruta
+                // acepte usuarios anonymous, es decir usuairos que no hacen loguin
     }
 }

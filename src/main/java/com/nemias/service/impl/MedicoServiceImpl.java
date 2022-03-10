@@ -4,6 +4,7 @@ import com.nemias.model.Medico;
 import com.nemias.repo.IMedicoRepo;
 import com.nemias.service.IMedicoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +27,9 @@ public class MedicoServiceImpl implements IMedicoService {
         return repo.save(obj);
     }
 
+    // Protegiendo el bloque de listado
+    //@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
+    @PreAuthorize("@restAuthServiceImpl.hasAcces('listar')")
     @Override
     public List<Medico> listar() {
         return repo.findAll();

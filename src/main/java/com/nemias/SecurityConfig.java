@@ -16,8 +16,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+
+import javax.sql.DataSource;
 
 @Configuration // indicando que esta clase va ser una configuracion de spring y va ser un Bean
 @EnableWebSecurity // habilitando seguridad web
@@ -41,6 +44,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    @Autowired
+    private DataSource dataSource;
 
     // Añadiendo in Bean, este nos devolverá una instancia de Bcrypt, el objetivo es hacer un autowired
     // de esto, y este nos devuelva la instancia, ademas esta en un @Configuration, y esto lo carga Spring
@@ -105,8 +110,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public TokenStore tokenStore() {
         // es para probar tokenss nivel de memoria, y el otro a nivel de base de datos, e incluso se le psas nuestro
         // AccessTokenConverter
-        return new JwtTokenStore(accessTokenConverter());
-        //return new JdbcTokenStore(this.dataSource);
+        //return new JwtTokenStore(accessTokenConverter());
+        return new JdbcTokenStore(this.dataSource);
     }
 
     @Bean
