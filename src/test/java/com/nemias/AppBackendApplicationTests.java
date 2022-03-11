@@ -23,7 +23,7 @@ class AppBackendApplicationTests {
     void crearUsuarios() {
         Usuario usuario = new Usuario();
         usuario.setIdUsuario(3);
-        usuario.setUsername("jaime");
+        usuario.setUsername("pepe");
         // hasheando la contraseña
         usuario.setPassword(bcrypt.encode("000"));
         usuario.setEnabled(true);

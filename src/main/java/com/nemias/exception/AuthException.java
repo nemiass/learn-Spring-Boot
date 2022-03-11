@@ -1,4 +1,4 @@
-package com.nemias;
+package com.nemias.exception;
 
 import java.io.IOException;
 import java.util.Date;

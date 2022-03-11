@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/tokens")
 public class TokenController {
 
-    @Autowired
-    private ConsumerTokenServices tokenService;
-
-    // ":.*" es para que por la url no tome a los "." como un bloque distinto, sino los tome a todos como variable url
-    @GetMapping(value = "/anular/{tokenId:.*}")
-    public void revokeToken(@PathVariable("tokenId") String token) {
-        // revocando el token, el frontend debe hacer la peticion a esta ruta para revocar el token
-        tokenService.revokeToken(token);
-    }
+//    @Autowired
+//    private ConsumerTokenServices tokenService;
+//
+//    // ":.*" es para que por la url no tome a los "." como un bloque distinto, sino los tome a todos como variable url
+//    @GetMapping(value = "/anular/{tokenId:.*}")
+//    public void revokeToken(@PathVariable("tokenId") String token) {
+//        // revocando el token, el frontend debe hacer la peticion a esta ruta para revocar el token
+//        tokenService.revokeToken(token);
+//    }
 }

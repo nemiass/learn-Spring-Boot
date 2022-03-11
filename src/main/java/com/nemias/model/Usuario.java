@@ -21,10 +21,6 @@ public class Usuario {
 
     // Creando la relacion de muchos a muchos con la table de Rols
     @ManyToMany(fetch = FetchType.EAGER)
-    // con name indicamos la tabla intermedia que se va crear, en joinColumnas le pasamos e nombre que va tener el
-    // campo en BD ya tambien a quien hace referencia, que en este caso es "idUsuario", luego hacemos lo mismo
-    // en la tabla inversa que sería Rol, le indicamos el nombre que va tener en la tabla y a quien hace referencia,
-    // que en este caso es "idRol"
     @JoinTable(name = "usuario_rol", joinColumns = @JoinColumn(name = "id_usuario", referencedColumnName = "idUsuario"),
         inverseJoinColumns = @JoinColumn(name = "id_rol", referencedColumnName = "idRol"))
     private List<Rol> roles;
