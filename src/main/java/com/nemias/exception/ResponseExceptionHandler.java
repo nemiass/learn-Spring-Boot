@@ -3,6 +3,7 @@ package com.nemias.exception;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -53,4 +54,13 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
                 new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.NOT_FOUND);
     }
+
+//    @ExceptionHandler(UsernameNotFoundException.class)
+//    public final ResponseEntity<ExceptionResponse> UserNotFound(ModelNotFoundException ex,
+//            WebRequest request)
+//    {
+//        ExceptionResponse exceptionResponse =
+//                new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
+//        return new ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.NOT_FOUND);
+//    }
 }
