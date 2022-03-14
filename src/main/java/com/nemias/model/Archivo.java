@@ -1,5 +1,7 @@
 package com.nemias.model;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import javax.persistence.*;
 
 @Entity
@@ -9,7 +11,6 @@ public class Archivo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idArchivo;
-
     private String fileName;
     private String fileType;
     private byte[] value;

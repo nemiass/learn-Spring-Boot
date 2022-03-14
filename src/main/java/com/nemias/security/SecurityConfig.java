@@ -1,12 +1,13 @@
 package com.nemias.security;
 
-import com.nemias.exception.AuthException;
-import com.nemias.security.auth.CustomAuthenticationFilter;
-import com.nemias.security.auth.CustomAuthorizationFilter;
+import com.nemias.exception.AuthEntrypointException;
+import com.nemias.exception.AuthFailureHandlerException;
+import com.nemias.security.auth.JwtAuthenticationFilter;
+import com.nemias.security.auth.JwtAuthorizationFilter;
+import com.nemias.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -17,7 +18,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static jdk.nashorn.internal.runtime.PropertyDescriptor.GET;
 
@@ -30,6 +30,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    @Autowired
+    JwtUtil jwtUtil;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -41,6 +44,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+    @Bean JwtAuthorizationFilter customAuthorizationFilter() {
+        return new JwtAuthorizationFilter();
+    }
+
     @Autowired
     protected void configure(AuthenticationManagerBuilder auth) throws Exception{
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
@@ -50,20 +57,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // modificando la rita pro defecto de "localhost:8080/login" de spring security
-        CustomAuthenticationFilter authenticationFilter =
-                new CustomAuthenticationFilter(authenticationManagerBean());
-        authenticationFilter.setFilterProcessesUrl("/api/login");
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManagerBean(),
+                jwtUtil);
+        jwtAuthenticationFilter.setFilterProcessesUrl("/api/login");
+        jwtAuthenticationFilter.setAuthenticationFailureHandler(new AuthFailureHandlerException());
 
         http.csrf().disable();
-        http.exceptionHandling().authenticationEntryPoint(new AuthException());
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.exceptionHandling().authenticationEntryPoint(new AuthEntrypointException());
         http.authorizeRequests().antMatchers("/api/login/**", "/api/token/refresh").permitAll();
-        http.authorizeRequests().antMatchers(GET, "/menus").hasAnyAuthority("USER");
+        http.authorizeRequests().antMatchers(GET, "/menus").hasAuthority("USER");
         http.authorizeRequests().anyRequest().authenticated();
-        http.addFilter(authenticationFilter);
-        http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilter(jwtAuthenticationFilter);
+        http.addFilterBefore(customAuthorizationFilter(), JwtAuthenticationFilter.class);
     }
 }
-
-
-
